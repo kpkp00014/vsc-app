@@ -5,7 +5,9 @@ const hpp = require("hpp");
 const cors = require("cors");
 const helmet = require("helmet");
 const projectRoutes = require("./routes/api/project.js");
-
+const authRoutes = require("./routes/api/auth.js");
+const storageRoutes = require("./routes/api/storage.js");
+const userRoutes = require("./routes/api/user.js");
 const app = express();
 const { MONGO_URI } = config;
 
@@ -19,7 +21,10 @@ app.use(express.json());
 
 /*               라우터                 */
 app.get("/");
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/project", projectRoutes);
+app.use("/api/storage", storageRoutes);
 
 mongoose
   .connect(MONGO_URI, {
