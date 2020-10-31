@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
       context: ./nginx
     ports:
-      - "3000:80"
+      - "5000:80"
 
   backend:
     build:
@@ -26,3 +26,9 @@ services:
     volumes:
       - /app/node_modules
       - ./backend:/app
+    environment:
+      - AWS_KEY=AKIAIXXETQE2IVAWMXYQ
+      - AWS_PRIVATE_KEY=Dlm8UKxAeh3LBqsrMcM+MjRGmuynl7Hg+yEnuopW
+      - JWT_SECRET=seCretKeY
+      - MONGO_URI=mongodb+srv://kpkp00014:q1w2e3r4@userinfo.wxh4r.mongodb.net/vscapp?retryWrites=true&w=majority
+      - REACT_APP_BASIC_SERVER_URL=l92.168.99.100:5000
