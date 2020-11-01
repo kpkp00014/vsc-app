@@ -179,20 +179,15 @@ router.post("/export", auth, async (req, res) => {
     "YYMMDDhhmmss"
   )}.png`;
   console.log(html, "html");
-  const image = await nodeHtmlToImage(
-    {
-      html: html,
-      puppeteerArgs: {
-        executablePath: "/usr/bin/google-chrome-stable",
-        headless: true,
-        timeout: 0,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      },
+  const image = await nodeHtmlToImage({
+    html: html,
+    puppeteerArgs: {
+      executablePath: "/usr/bin/google-chrome-stable",
+      headless: true,
+      timeout: 0,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     },
-    function (err, data) {
-      if (err) console.log("nothmltoimage err occured : ", err);
-    }
-  );
+  });
   let param = {
     Bucket: "xcezsimplestorage",
     ACL: "public-read",
@@ -200,7 +195,7 @@ router.post("/export", auth, async (req, res) => {
     Body: image,
     ContentType: "image/png",
   };
-  await s3.upload(param, function (err, data) {
+  s3.upload(param, function (err, data) {
     if (err) console.log(err);
   });
   res.json({ success: true });
