@@ -6,6 +6,7 @@ const User = require("../../models/user.js");
 const Item = require("../../models/item.js");
 const { AWS_KEY, AWS_PRIVATE_KEY } = require("../../config/index.js");
 const AWS = require("aws-sdk");
+const nodeHtmlToImage = require("node-html-to-image");
 const s3 = new AWS.S3({
   accessKeyId: AWS_KEY,
   secretAccessKey: AWS_PRIVATE_KEY,
@@ -143,7 +144,58 @@ router.post("/delete", auth, async (req, res) => {
 // @desc    export project
 // @access  Public
 router.post("/export", auth, async (req, res) => {
-  console.log("export 요청");
+  const { project } = req.body;
+  const projectFind = await Project.findById(project).populate({
+    path: "items",
+  });
+  const result = projectFind.items;
+
+  let html = `<html><head><style>
+  @import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+  
+  body {
+    width: 600px;
+    min-height: 10px;
+  }
+  img {
+    width: 100%;
+    vertical-align: middle;
+    border-style: none;
+  }
+  span {
+    font-family: 'Nanum Gothic', sans-serif;  
+    font-size: 1.5em;
+  }
+  </style></head><body>`;
+  result.forEach((item) => {
+    if (item.isImage) {
+      html += `<div><img src=${item.content} /></div>`;
+    } else {
+      html += `<div><span>${item.content}</span></div>`;
+    }
+  });
+  html += "</body></html>";
+  const filepath = `${req.user.id}/ProjectResult_${moment().format(
+    "YYMMDDhhmmss"
+  )}.png`;
+  const image = await nodeHtmlToImage({
+    html: html,
+    puppeteerArgs: {
+      executablePath: "/usr/bin/google-chrome-stable",
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    },
+  });
+  let param = {
+    Bucket: "xcezsimplestorage",
+    ACL: "public-read",
+    Key: filepath,
+    Body: image,
+    ContentType: "image/png",
+  };
+  s3.upload(param, function (err, data) {
+    if (err) console.log(err);
+  });
   res.json({ success: true });
 });
 
