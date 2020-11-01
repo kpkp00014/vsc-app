@@ -2,7 +2,7 @@ version: "3"
 services:
   frontend:
     build:
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
       context: ./frontend
     volumes:
       - /app/node_modules
@@ -10,7 +10,11 @@ services:
     stdin_open: true
     environment:
       - CHOKIDAR_USEPOLLING=true
-
+    deploy:
+      resources:
+        limits:
+          cpus: "0.001"
+          memory: 50M
   nginx:
     restart: always
     build:
@@ -18,7 +22,11 @@ services:
       context: ./nginx
     ports:
       - "5000:80"
-
+    deploy:
+      resources:
+        limits:
+          cpus: "0.001"
+          memory: 50M
   backend:
     build:
       dockerfile: Dockerfile.dev
@@ -26,3 +34,8 @@ services:
     volumes:
       - /app/node_modules
       - ./backend:/app
+    deploy:
+      resources:
+        limits:
+          cpus: "0.001"
+          memory: 50M
