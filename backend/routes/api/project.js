@@ -184,6 +184,7 @@ router.post("/export", auth, async (req, res) => {
     puppeteerArgs: {
       executablePath: "/usr/bin/google-chrome-stable",
       headless: true,
+      timeout: 0,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     },
   });
